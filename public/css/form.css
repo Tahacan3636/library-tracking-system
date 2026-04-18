@@ -1,0 +1,122 @@
+body {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.form-container {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 15px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.form-group input:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.submit-btn:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+.message-box {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.message-entry {
+  background: #d1fae5;
+  color: #065f46;
+  border: 2px solid #a7f3d0;
+}
+
+.message-exit {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 2px solid #bfdbfe;
+}
+
+.message-error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 2px solid #fecaca;
+}
+
+.message-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 2px solid #fde68a;
+}
+
+.message-name {
+  display: block;
+  font-size: 22px;
+  margin-top: 6px;
+}
+
+.message-duration {
+  display: block;
+  font-size: 16px;
+  margin-top: 4px;
+  font-weight: 500;
+}

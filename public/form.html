@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check-In / Check-Out - Library System</title>
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#8B1A2D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .form-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--primary);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .form-card h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .form-card .desc {
+      color: var(--text-light);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--secondary);
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 3px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 26, 45, 0.1);
+    }
+
+    .input-group input::placeholder {
+      letter-spacing: 0;
+      font-weight: 400;
+      font-size: 15px;
+      color: #94A3B8;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(139, 26, 45, 0.25);
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(139, 26, 45, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message-box {
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      animation: slideUp 0.3s ease;
+      display: none;
+    }
+
+    .message-box.show { display: block; }
+
+    .message-box .msg-icon { font-size: 36px; margin-bottom: 8px; }
+    .message-box .msg-text { font-size: 16px; font-weight: 700; }
+    .message-box .msg-detail { font-size: 14px; margin-top: 4px; font-weight: 500; }
+
+    .msg-entry { background: var(--success-bg); color: #166534; border: 2px solid #86EFAC; }
+    .msg-exit { background: var(--info-bg); color: #1E40AF; border: 2px solid #93C5FD; }
+    .msg-error { background: var(--danger-bg); color: #991B1B; border: 2px solid #FCA5A5; }
+    .msg-warning { background: var(--warning-bg); color: #854D0E; border: 2px solid #FDE047; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes iconPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .message-box.show .msg-icon { animation: iconPop 0.5s ease; }
+    .message-box.show { animation: slideUp 0.4s ease, pulse 0.6s ease 0.4s; }
+
+    .msg-student-name { font-size: 20px; font-weight: 800; margin-top: 4px; }
+    .msg-time { font-size: 12px; color: inherit; opacity: 0.7; margin-top: 6px; }
+
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999; overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute; width: 8px; height: 8px; border-radius: 2px;
+      animation: confettiFall 2s ease-in forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { opacity: 1; transform: translateY(-10px) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    .reset-bar { height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+    .reset-bar .fill { height: 100%; background: currentColor; border-radius: 2px; animation: shrink 3s linear forwards; }
+
+    @keyframes shrink { from { width: 100%; } to { width: 0%; } }
+
+    @media (max-width: 480px) {
+      .form-card { padding: 28px 20px; }
+      .form-card h1 { font-size: 20px; }
+      .input-group input { font-size: 18px; padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <div class="brand-text">
+        <span class="brand-title">Library System</span>
+        <span class="brand-subtitle">Check-In / Check-Out Tracking</span>
+      </div>
+    </a>
+    <div class="navbar-nav">
+      <a href="/">Home</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="form-card">
+      <div class="form-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+      </div>
+
+      <h1>Check-In / Check-Out</h1>
+      <p class="desc">Enter your student ID, the system will automatically check you in or out</p>
+
+      <form id="checkinForm">
+        <div class="input-group">
+          <label for="schoolNo">Student ID</label>
+          <input type="text" id="schoolNo" placeholder="e.g. 2024001" autocomplete="off" inputmode="numeric" autofocus required>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">Confirm</button>
+      </form>
+
+      <div class="message-box" id="messageBox"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>Library Check-In/Out Tracking System</div>
+    <div class="footer-right">Developed by: Muhammed Taha CAN &bull; Ilhan Sidal KARADENIZ &bull; Furkan YILMAZ</div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var form = document.getElementById('checkinForm');
+      var input = document.getElementById('schoolNo');
+      var btn = document.getElementById('submitBtn');
+      var msgBox = document.getElementById('messageBox');
+      var resetTimer = null;
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var schoolNo = input.value.trim();
+        if (!schoolNo) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+        msgBox.classList.remove('show');
+
+        try {
+          var res = await fetch('/api/check-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ school_no: schoolNo })
+          });
+          var data = await res.json();
+          showMessage(data);
+        } catch (err) {
+          showMessage({ status: 'error', message: 'Could not connect to server' });
+        }
+
+        if (resetTimer) clearTimeout(resetTimer);
+        resetTimer = setTimeout(function() {
+          msgBox.classList.remove('show');
+          msgBox.className = 'message-box';
+          input.value = '';
+          input.focus();
+          btn.disabled = false;
+          btn.textContent = 'Confirm';
+        }, 3000);
+      });
+
+      function showMessage(data) {
+        var icon = '';
+        var cls = '';
+        var detail = '';
+        var title = '';
+
+        switch(data.status) {
+          case 'entry':
+            icon = '&#9989;'; cls = 'msg-entry';
+            title = 'Welcome!';
+            if (data.status === 'entry') showConfetti();
+            break;
+          case 'exit':
+            icon = '&#128075;'; cls = 'msg-exit';
+            title = 'Goodbye!';
+            if (data.durationText) detail = data.durationText;
+            break;
+          case 'already_inside':
+            icon = '&#9888;'; cls = 'msg-warning';
+            title = 'Warning';
+            break;
+          case 'not_found':
+            icon = '&#10060;'; cls = 'msg-error';
+            title = 'Error';
+            break;
+          default:
+            icon = '&#10060;'; cls = 'msg-error';
+            title = 'Error';
+        }
+
+        var now = new Date();
+        var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        msgBox.className = 'message-box show ' + cls;
+        msgBox.innerHTML =
+          '<div class="msg-icon">' + icon + '</div>' +
+          '<div class="msg-text">' + escapeHtml(title) + '</div>' +
+          '<div class="msg-student-name">' + escapeHtml(data.message || data.error || 'An error occurred') + '</div>' +
+          (detail ? '<div class="msg-detail">' + escapeHtml(detail) + '</div>' : '') +
+          '<div class="msg-time">Time: ' + timeStr + '</div>' +
+          '<div class="reset-bar"><div class="fill"></div></div>';
+      }
+
+      function showConfetti() {
+        var container = document.createElement('div');
+        container.className = 'confetti-container';
+        document.body.appendChild(container);
+
+        var colors = ['#8B1A2D', '#059669', '#EAB308', '#3B82F6', '#8B5CF6'];
+        for (var i = 0; i < 40; i++) {
+          var confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.8 + 's';
+          confetti.style.animationDuration = (1.5 + Math.random()) + 's';
+          container.appendChild(confetti);
+        }
+
+        setTimeout(function () {
+          if (container.parentNode) container.parentNode.removeChild(container);
+        }, 3000);
+      }
+
+      function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+    });
+  </script>
+</body>
+</html>

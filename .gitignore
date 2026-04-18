@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploads
+uploads/
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Claude Code
+.claude/
+
+# Old/unused files
+Library Systems/
+new_index.html
+ostim-logo.png

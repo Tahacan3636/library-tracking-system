@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Check-In/Out</title>
+  <link rel="stylesheet" href="../css/form.css">
+</head>
+<body>
+  <div class="form-container">
+    <h1 class="form-title">Library Check-In / Check-Out</h1>
+
+    <form id="checkinForm">
+      <div class="form-group">
+        <label for="schoolNo">Student ID</label>
+        <input type="text" id="schoolNo" placeholder="e.g. 2024001" autocomplete="off" autofocus required>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">Confirm</button>
+    </form>
+
+    <div id="messageBox" class="message-box hidden"></div>
+  </div>
+
+  <script src="../js/form.js"></script>
+</body>
+</html>

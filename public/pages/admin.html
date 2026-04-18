@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Library System</title>
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/staff.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/js/auth-guard.js"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="header-brand">
+      <h1>Admin Panel</h1>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('students')">Student Management</button>
+      <button class="tab-btn" onclick="switchTab('logs')">Check-In/Out Logs</button>
+      <button class="tab-btn" onclick="switchTab('status')">Current Status</button>
+      <button class="tab-btn" onclick="switchTab('users')">User Management</button>
+    </div>
+
+    <!-- Tab 0: Dashboard -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="toolbar" style="margin-bottom:16px;">
+        <div class="spacer"></div>
+        <button class="btn btn-primary btn-sm" onclick="openReport('month')">Monthly Report</button>
+        <button class="btn btn-primary btn-sm" onclick="openReport('week')">Weekly Report</button>
+        <button class="btn btn-primary btn-sm" onclick="openReport('today')">Today's Report</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="statTodayVisits">0</div>
+          <div class="stat-label">Today's Visits</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statCurrentInside">0</div>
+          <div class="stat-label">Currently Inside</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statAvgDuration">0</div>
+          <div class="stat-label">Avg. Stay (min)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTotalStudents">0</div>
+          <div class="stat-label">Total Students</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card" style="flex:2;">
+          <div class="stat-label" style="margin-bottom:12px; font-weight:700; font-size:15px; color:var(--text);">Last 7 Days - Daily Visits</div>
+          <div style="position:relative; height:250px;"><canvas id="chartDaily"></canvas></div>
+        </div>
+        <div class="stat-card" style="flex:1;">
+          <div class="stat-label" style="margin-bottom:12px; font-weight:700; font-size:15px; color:var(--text);">Weekly Comparison</div>
+          <div style="position:relative; height:250px;"><canvas id="chartWeekly"></canvas></div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card" style="flex:1;">
+          <div class="stat-label" style="margin-bottom:12px; font-weight:700; font-size:15px; color:var(--text);">Hourly Traffic</div>
+          <div style="position:relative; height:250px;"><canvas id="chartHourly"></canvas></div>
+        </div>
+        <div class="stat-card" style="flex:1;">
+          <div class="stat-label" style="margin-bottom:12px; font-weight:700; font-size:15px; color:var(--text);">Top 10 Students by Avg. Stay</div>
+          <div id="topStudentsList" style="margin-top:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Student Management -->
+    <div class="tab-content" id="tab-students">
+      <div class="toolbar">
+        <input type="text" id="studentSearch" placeholder="Search (name, surname, student ID)..." oninput="searchStudents()">
+        <div class="spacer"></div>
+        <button class="btn btn-primary btn-sm" onclick="showAddStudent()">Add New Student</button>
+        <button class="btn btn-success btn-sm" onclick="showImport()">Import CSV/Excel</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Student ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTableBody"></tbody>
+      </table>
+      <div class="pagination" id="studentsPagination"></div>
+    </div>
+
+    <!-- Tab 2: Logs -->
+    <div class="tab-content" id="tab-logs">
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Start Date</label>
+          <input type="date" id="logStartDate">
+        </div>
+        <div class="filter-group">
+          <label>End Date</label>
+          <input type="date" id="logEndDate">
+        </div>
+        <div class="filter-group">
+          <label>Student Name</label>
+          <input type="text" id="logStudentName" placeholder="Name or surname">
+        </div>
+        <div class="filter-group">
+          <label>Student ID</label>
+          <input type="text" id="logSchoolNo" placeholder="Student ID">
+        </div>
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary btn-sm" onclick="loadLogs()">Filter</button>
+        </div>
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-success btn-sm" onclick="exportLogs('csv')">Download CSV</button>
+        </div>
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-success btn-sm" onclick="exportLogs('xlsx')">Download Excel</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Student ID</th>
+            <th>Entry Time</th>
+            <th>Exit Time</th>
+            <th>Duration (min)</th>
+          </tr>
+        </thead>
+        <tbody id="logsTableBody"></tbody>
+      </table>
+      <div class="pagination" id="logsPagination"></div>
+    </div>
+
+    <!-- Tab 3: Current Status -->
+    <div class="tab-content" id="tab-status">
+      <div class="counter-card">
+        <div class="counter-label">Current Student Count</div>
+        <div class="counter-value" id="adminStudentCount">0</div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">Students Inside</div>
+        <table class="staff-table">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Student ID</th>
+              <th>Entry Time</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminActiveTable">
+            <tr><td colspan="4" class="empty-message">No students inside yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 4: User Management -->
+    <div class="tab-content" id="tab-users">
+      <div class="toolbar">
+        <div class="spacer"></div>
+        <button class="btn btn-primary btn-sm" onclick="showAddUser()">Add New User</button>
+        <button class="btn btn-secondary btn-sm" onclick="showChangePassword()">Change My Password</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>Library Check-In/Out Tracking System</div>
+    <div class="footer-right">Developed by: Muhammed Taha CAN &bull; Ilhan Sidal KARADENIZ &bull; Furkan YILMAZ</div>
+  </div>
+
+  <!-- Add User Modal -->
+  <div class="modal-overlay hidden" id="userModal">
+    <div class="modal">
+      <h2>Add New User</h2>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="newUsername" placeholder="Username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="newUserPassword" placeholder="Password (min 6 chars)">
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="newUserRole">
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('userModal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="createUser()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay hidden" id="passwordModal">
+    <div class="modal">
+      <h2>Change Password</h2>
+      <div class="form-group">
+        <label>Current Password</label>
+        <input type="password" id="currentPassword" placeholder="Your current password">
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="newPassword" placeholder="New password (min 6 chars)">
+      </div>
+      <div id="passwordResult"></div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('passwordModal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="changePassword()">Change</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Student Modal -->
+  <div class="modal-overlay hidden" id="studentModal">
+    <div class="modal">
+      <h2 id="modalTitle">Add New Student</h2>
+      <input type="hidden" id="editStudentId">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="modalName" placeholder="First name">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" id="modalSurname" placeholder="Last name">
+      </div>
+      <div class="form-group">
+        <label>Student ID</label>
+        <input type="text" id="modalSchoolNo" placeholder="Student ID number">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveStudent()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal-overlay hidden" id="importModal">
+    <div class="modal">
+      <h2>Import CSV / Excel</h2>
+      <p style="color: var(--text-light); margin-bottom: 16px; font-size: 14px;">
+        Your file must contain <strong>name</strong> (or ad), <strong>surname</strong> (or soyad),
+        <strong>school_no</strong> (or okul_no) columns.
+      </p>
+      <div class="file-upload" onclick="document.getElementById('importFile').click()">
+        <p id="fileLabel">Click to select a file (.csv or .xlsx)</p>
+        <input type="file" id="importFile" accept=".csv,.xlsx" onchange="onFileSelect(this)">
+      </div>
+      <div id="importResult"></div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeImportModal()">Close</button>
+        <button class="btn btn-primary btn-sm" id="importBtn" onclick="uploadFile()" disabled>Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

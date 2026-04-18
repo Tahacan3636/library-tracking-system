@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Check-In/Out System</title>
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#8B1A2D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 640px;
+    }
+
+    .hero-content h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .hero-content .subtitle {
+      font-size: 16px;
+      color: var(--text-light);
+      margin-bottom: 36px;
+    }
+
+    .qr-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      display: inline-block;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 28px;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+
+    .qr-card::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 19px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--primary));
+      z-index: -1;
+    }
+
+    #qrcode {
+      width: 260px;
+      height: 260px;
+    }
+
+    #qrcode img {
+      width: 260px;
+      height: 260px;
+      border-radius: 6px;
+    }
+
+    .qr-loading {
+      width: 260px;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      font-size: 15px;
+    }
+
+    .scan-label {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .scan-desc {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 20px;
+    }
+
+    .manual-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--primary);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(139, 26, 45, 0.3);
+    }
+
+    .manual-link:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139, 26, 45, 0.35);
+    }
+
+    .steps {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .step-card {
+      flex: 1;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+
+    .step-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .step-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .step-card p {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .hero-content h1 { font-size: 22px; }
+      #qrcode, #qrcode img, .qr-loading {
+        width: 200px !important;
+        height: 200px !important;
+      }
+      .qr-card { padding: 20px; }
+      .steps { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <div class="brand-text">
+        <span class="brand-title">Library System</span>
+        <span class="brand-subtitle">Check-In / Check-Out Tracking</span>
+      </div>
+    </a>
+    <div class="navbar-nav">
+      <a href="/giris">Check-In / Out</a>
+      <a href="/pages/login.html" class="nav-btn">Admin Panel</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>Library Check-In / Check-Out System</h1>
+      <p class="subtitle">Scan the QR code with your phone or click the button below</p>
+
+      <div class="qr-card">
+        <div id="qrcode">
+          <div class="qr-loading">Generating QR code...</div>
+        </div>
+      </div>
+
+      <div>
+        <p class="scan-label">Scan QR Code</p>
+        <p class="scan-desc">Point your phone camera at the QR code to open the check-in/out form</p>
+        <a href="/giris" class="manual-link">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Open Form Directly
+        </a>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3>Scan QR Code</h3>
+          <p>Point your phone camera at the QR code on screen</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3>Enter Your Student ID</h3>
+          <p>Enter your school number on the form and press Confirm</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3>Auto Check-In/Out</h3>
+          <p>The system knows your status and automatically checks you in or out</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>Library Check-In/Out Tracking System</div>
+    <div class="footer-right">Developed by: Muhammed Taha CAN &bull; Ilhan Sidal KARADENIZ &bull; Furkan YILMAZ</div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var container = document.getElementById('qrcode');
+
+      fetch('/api/qrcode')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var img = document.createElement('img');
+          img.src = data.qr;
+          img.alt = 'QR Code';
+          img.style.width = '260px';
+          img.style.height = '260px';
+          img.style.borderRadius = '6px';
+          container.innerHTML = '';
+          container.appendChild(img);
+        })
+        .catch(function() {
+          container.innerHTML = '<div class="qr-loading">Failed to generate QR code</div>';
+        });
+    });
+  </script>
+</body>
+</html>

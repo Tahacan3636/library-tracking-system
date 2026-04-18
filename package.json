@@ -1,0 +1,53 @@
+{
+  "name": "kutuphane-takip-sistemi",
+  "version": "1.0.0",
+  "description": "QR kod tabanli kutuphane giris-cikis takip sistemi. Gercek zamanli ogrenci sayaci, admin paneli, istatistikler ve raporlama ozellikleri.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "migrate": "node db/migrate.js",
+    "seed": "node db/seed.js",
+    "setup": "node db/migrate.js && node db/seed.js"
+  },
+  "keywords": [
+    "library",
+    "kutuphane",
+    "qr-code",
+    "check-in",
+    "tracking",
+    "nodejs",
+    "express",
+    "sqlite",
+    "socket.io",
+    "real-time"
+  ],
+  "author": "Tahacan3636",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tahacan3636/library-tracking-system.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.6.2",
+    "cors": "^2.8.6",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.0",
+    "helmet": "^8.1.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
